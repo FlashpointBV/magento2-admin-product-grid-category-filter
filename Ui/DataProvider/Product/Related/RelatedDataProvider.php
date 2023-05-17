@@ -26,18 +26,31 @@ class RelatedDataProvider extends \Magento\Catalog\Ui\DataProvider\Product\Relat
 
     public function addFilter(Filter $filter)
     {
-        if ($filter->getField() == 'category_id') {
-            $this->getCollection()->addCategoriesFilter(array('in' => $filter->getValue()));
-        } else if (isset($this->addFilterStrategies[$filter->getField()])) {
+        if ($filter->getField() === 'category_id') {
+            if(in_array('-1', (array)$filter->getValue(), true)) {
+                $this->getCollection()->getSelect()->joinLeft(
+                    ['ccp' => $this->getCollection()->getTable('catalog_category_product')],
+                    'e.entity_id = ccp.product_id',
+                    []
+                )->where('ccp.category_id IS NULL');
+                return;
+            }
+
+            $this->getCollection()->addCategoriesFilter(['in' => $filter->getValue()]);
+            return;
+        }
+
+        if (isset($this->addFilterStrategies[$filter->getField()])) {
             $this->addFilterStrategies[$filter->getField()]
                 ->addFilter(
                     $this->getCollection(),
                     $filter->getField(),
                     [$filter->getConditionType() => $filter->getValue()]
                 );
-        } else {
-            parent::addFilter($filter);
+            return;
         }
+
+        parent::addFilter($filter);
     }
 
 }

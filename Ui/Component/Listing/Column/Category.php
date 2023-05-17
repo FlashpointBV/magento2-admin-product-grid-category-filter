@@ -21,7 +21,7 @@ class Category extends Column
 
                 $categoryIds = $product->getCategoryIds();
                 $categories = array();
-                
+
                 if (count($categoryIds)) {
                     foreach ($categoryIds as $categoryId) {
                         $category = $objectManager->create('Magento\Catalog\Model\Category')->load($categoryId);
