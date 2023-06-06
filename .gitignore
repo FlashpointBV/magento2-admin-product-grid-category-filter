@@ -1,0 +1,18 @@
+/vendor
+/.idea
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Sonarlint plugin
+.idea
+
+# Development ignores
+.phpstorm.meta.php
+_ide_helper.php
+
+composer.lock
