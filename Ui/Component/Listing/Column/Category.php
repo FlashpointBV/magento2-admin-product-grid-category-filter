@@ -39,7 +39,7 @@ class Category extends Column
     protected function getCategoryTree($category) {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $parentCategory = $objectManager->create('Magento\Catalog\Model\Category')->load($category->getParentId());
-        if ($parentCategory->getId() && $parentCategory->getLevel() > 1) {
+        if ($parentCategory->getId() && $parentCategory->getLevel() >= 1) {
             return $this->getCategoryTree($parentCategory) . ' » ' . $category->getName();
         } else {
             return $category->getName();
