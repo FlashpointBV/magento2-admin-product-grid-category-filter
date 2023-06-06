@@ -31,37 +31,19 @@ class CategoryList implements ArrayInterface
         return $options;
     }
 
-    private function renderTree(CategoryInterface $category, array &$tree): void
-    {
-        if ($category->getLevel() >= 1) {
-            $tree[] = $this->createOption($category);
+    private function renderTree($node, &$options, $path = '') {
+        if ($node->getLevel() >= 1) {
+            $path .= (empty($path) ? '' : ' » ') . $node->getName();
+            $options[] = ['label' => $path, 'value' => $node->getId()];
         }
 
-        foreach ($category->getChildrenData() as $childCategory) {
-            $tree[] = [$childCategory->getId() => $this->createLabel($childCategory)];
+        $children = $node->getChildrenData();
+        usort($children, function($a, $b) {
+            return strcmp($a->getName() ?? '', $b->getName() ?? '');
+        });
 
-            if ( ! $childCategory->getChildrenData()) {
-                continue;
-            }
-
-            $this->renderTree($childCategory, $tree);
+        foreach ($children as $child) {
+            $this->renderTree($child, $options, $path);
         }
-    }
-
-    private function createOption(CategoryInterface $category): array
-    {
-        return ['label' => $this->createLabel($category), 'value' => $category->getId()];
-    }
-
-    private function createLabel(CategoryInterface $category): string
-    {
-        $level = $category->getLevel() - 1;
-
-        return sprintf(
-            '%s %s (ID: %s)',
-            '|' . ($level > 0 ? str_repeat('-', $level) : ''),
-            $category->getName(),
-            $category->getId()
-        );
     }
 }

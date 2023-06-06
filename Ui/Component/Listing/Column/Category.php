@@ -25,13 +25,24 @@ class Category extends Column
                 if (count($categoryIds)) {
                     foreach ($categoryIds as $categoryId) {
                         $category = $objectManager->create('Magento\Catalog\Model\Category')->load($categoryId);
-                        $categories[] = $category->getName();
+                        $categories[] = $this->getCategoryTree($category);
                     }
                 }
-                $item[$fieldName] = implode(',', $categories);
+                sort($categories);
+                $item[$fieldName] = implode(', ', $categories);
             }
         }
 
         return $dataSource;
+    }
+
+    protected function getCategoryTree($category) {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $parentCategory = $objectManager->create('Magento\Catalog\Model\Category')->load($category->getParentId());
+        if ($parentCategory->getId() && $parentCategory->getLevel() > 1) {
+            return $this->getCategoryTree($parentCategory) . ' » ' . $category->getName();
+        } else {
+            return $category->getName();
+        }
     }
 }
